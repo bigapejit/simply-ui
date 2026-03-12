@@ -1,91 +1,96 @@
 # SimplyUI
 
-You don't have a building problem. You have a thinking problem.
+**This is not a framework and it's not trying to replace one.**
 
-You tell Claude "I need a settings page," it builds one, and you spend the next hour going "no, not like that." Then you try again. More rewrites. More steering. The AI is fast at building the wrong thing, and you're burning all that speed on course corrections.
+SimplyUI is just structured conversation. The back-and-forth you'd already have with Claude before building something — "what should this settings page do? who's it for? what can we skip?" — except now that conversation follows a path and produces a document at the end instead of disappearing into your chat history.
 
-The issue isn't the AI. It's that you didn't actually know what you wanted. You had a vibe, not a spec. And vibes don't survive contact with code.
+You still use whatever build system you want after. VBW, GSD, raw Claude, your own thing. SimplyUI just gets your thinking organized before that step. It produces documentation, not architecture.
 
-SimplyUI is a planning tool for Claude Code. Two slash commands that force you to think through what you're building before you build it. A structured conversation that ends with a clear, one-page brief you can hand to any AI or human and say "build this."
+If you use something like Wispr Flow to talk your prompts, you're going to get a lot out of this. SimplyUI basically lets you yap about your feature idea in a way that's structured enough for Claude to actually do something with later. Talk through what you're building, answer the questions it asks, and it organizes all of that rambling into a brief. If voice-first prompting already clicks for you, this is going to feel very natural.
 
-## How it works
+## Get started
 
-You run `/simply-ui` and it walks you through a series of questions. Not open-ended "tell me about your feature" questions. Specific, pointed ones designed to surface the stuff you haven't thought about yet.
+Two markdown files you drop into your project. Copy them in and they explain themselves.
 
-The process:
-
-1. **"If this feature does only ONE thing perfectly, what is it?"** This is your Commander's Intent. One sentence. If you say "and," you've got two features. Pick one.
-
-2. **Gap-finding.** Five fixed questions, same every time: What does the user do right before this? Right after? What happens when it breaks? When they change their mind halfway through? What would confuse a first-timer? Then an open brainstorm to get everything else out.
-
-3. **Cut.** Now you go through every idea and ask "what happens if we just don't build this?" If the answer is "the user figures it out," it's gone. You keep only what the user can't complete the core job without.
-
-4. **The brief.** Everything that survived gets written into a single document: the job, what to build, what NOT to build, defaults, screen breakdown, error states. Saved to `.simply/work/<slug>/brief.md`. That's the only file the framework writes per task. All the thinking stays in the conversation.
-
-The brief is portable. Copy it into a new Claude session and say "build this." Hand it to a teammate. Feed it into VBW. Whatever. SimplyUI doesn't care what happens after. It just makes sure you know what you're building first.
-
-### The second command: `/simply-ui-map`
-
-This one documents your app from the user's perspective. Not your perspective as the developer who built it. The user's.
-
-You walk Claude through what someone sees and does in your app, screen by screen. It creates a lightweight index of flows, screens, and decision counts. When you later run `/simply-ui` to plan something new, the framework reads the map to understand what already exists around the thing you're planning.
-
-There's a trick to how updates work. Instead of asking you "is the map still accurate?" (which puts all the work on you), the framework reads your code changes, generates what it *thinks* changed, and asks you to correct it. Correcting is way easier than describing from scratch. This is deliberate. Developers can't objectively describe their own app because they built it and can't unsee how it works. Flipping to correction mode defeats that.
-
-## Why it's built this way
-
-I kept overcomplicating my own UI. I'd plan a feature in my head, start building, realize I hadn't thought something through, bolt on more stuff, and end up with screens that tried to do too much. The AI made this worse because it could build fast enough to outrun my thinking.
-
-So I built a process that forces the thinking to happen first, and made it push back when I overcomplicate things. The personality is direct and skeptical on purpose. It asks "is that necessary?" more than "what else could we add?"
-
-The framework pulls from a few sources that shaped how it works:
-
-- **Commander's Intent** (Made to Stick, Heath & Heath) is why there's a single sentence goal before anything else. The military uses it because plans fall apart on contact with reality. Same thing happens with feature specs.
-- **Curse of Knowledge** (same book) is why the map command flips to correction mode instead of asking you to describe things. Once you know how something works, you literally cannot imagine what it's like not to know. You need someone else to describe it wrong so you can fix it.
-- **Jobs-to-be-Done** (Christensen, HBS) is why every feature gets reduced to one job in one sentence. If you can't state it that simply, the scope is wrong.
-- **Hick's Law** is why the framework counts decisions per screen and flags anything over 7. Every option you add is cognitive tax on the user.
-- **The Franchise Prototype** (The E-Myth, Gerber) is why the questions are the same every time. The system produces the result, not your ability to articulate design ideas on the fly.
-
-The `research/` folder has the full breakdown if you want to dig in.
-
-## Using SimplyUI with VBW
-
-If you use [VBW (Vibe Better With Claude Code)](https://github.com/yidakee/vibe-better-with-claude-code-vbw), SimplyUI fills the gap before VBW's lifecycle starts.
-
-VBW handles everything from scoping through verification. But it assumes you already know what you're building. SimplyUI is where you figure that out.
-
-1. Run `/simply-ui` to think through the feature. Get a brief.
-2. Run `/vbw:vibe` with the brief as input. VBW's architect scopes it, the lead plans it, devs build it, QA verifies it.
-
-The brief gives the architect what it needs without ambiguity: a job statement, what to build, what not to build, screen breakdown, constraints. No scope drift during the build.
-
-You can also run `/simply-ui-map` before a VBW milestone to give the architect full context on what users currently see in the app.
-
-## Installation
-
-Two markdown files. No packages, no dependencies.
-
-1. Clone or download this repo:
+1. Grab the repo:
    ```bash
    git clone https://github.com/bigapejit/simply-ui.git
    ```
 
-2. Copy the skill folders into your project:
+2. Copy the skills into your project:
    ```bash
    mkdir -p your-project/.claude/skills
    cp -r simply-ui/skills/simply-ui your-project/.claude/skills/
    cp -r simply-ui/skills/simply-ui-map your-project/.claude/skills/
    ```
 
-3. Use them in Claude Code:
+3. Run them:
    ```
    /simply-ui I need a settings page
    /simply-ui-map
    ```
 
-The first time you run `/simply-ui`, it asks a few questions about your app (what it does, who uses it, what the core actions are) and saves a `project.md` file. After that, it reads that file at the start of every session so it knows the context.
+That's it. The skills walk you through everything. First time it asks about your app, after that it remembers. You don't need to read anything below this to use it. But if you want to know more about how it works and why, keep going.
 
-### What gets created in your project
+---
+
+## What it actually does
+
+You know that thing where you tell Claude "I need a settings page" and it just builds one? And then you go "no, not like that" and spend an hour steering? The problem isn't Claude. It's that you didn't actually know what you wanted yet. You had a vibe, not a spec.
+
+SimplyUI is the conversation you should have had first. It asks you questions that surface the stuff you haven't thought about, then organizes your answers into a one-page brief that any AI or person can build from.
+
+The questions follow a fixed path every time:
+
+1. "If this feature does only ONE thing perfectly, what is it?" One sentence. If you say "and," that's two features. Pick one.
+
+2. Five gap-finding questions: What does the user do right before this? Right after? What happens when it breaks? When they change their mind? What would confuse someone seeing it for the first time? Then an open brainstorm to dump everything else out.
+
+3. Cut. Go through every idea and ask "what happens if we don't build this?" If the user figures it out on their own, it's gone.
+
+4. The brief. What survived gets written to `.simply/work/<slug>/brief.md`. The job, what to build, what not to build, defaults, screen layout, error states. One file. All the conversation stays in the conversation.
+
+Take that brief wherever you want. New Claude session, VBW, GSD, a teammate, a napkin. The brief is the handoff point.
+
+### `/simply-ui-map` — the other command
+
+This one documents your existing app from the user's perspective. Not how you built it. What someone sees when they open it.
+
+You walk through screens, flows, decisions. It creates a lightweight map. When you later plan something new with `/simply-ui`, the framework reads that map to understand what's already there. This matters most when you're changing existing UI, not building from scratch.
+
+Updates are clever: instead of asking "is this still right?" the framework reads your recent code changes, describes what it thinks changed, and asks you to correct it. Way easier than describing from scratch. This is intentional — you literally cannot objectively describe your own app because you know too much about how it works under the hood.
+
+## Pairs with any build workflow
+
+SimplyUI sits before your build process, not inside it.
+
+**With [VBW](https://github.com/yidakee/vibe-better-with-claude-code-vbw):** Run `/simply-ui` first, get your brief, then `/vbw:vibe` with the brief as input. VBW's architect gets a clear spec with no ambiguity. No scope drift during execution.
+
+**With GSD:** Same idea. `/simply-ui` produces the brief, then feed it into `/gsd:new-project` or `/gsd:plan-phase`. The brief gives the planner what it needs without you having to re-explain everything.
+
+**With nothing:** Just copy the brief into a new Claude session and say "build this." It works fine standalone.
+
+## Why I built this
+
+I kept overcomplicating my own UI. I'd plan a feature in my head, start building, realize I hadn't thought something through, bolt on more stuff, and end up with screens doing too much. AI made this worse — it builds fast enough to outrun your thinking. You can have a bad idea fully implemented before you realize it was bad.
+
+So I built something that forces the thinking to happen first. The personality is direct and skeptical on purpose. It asks "is that necessary?" way more than "what else could we add?"
+
+It's the kind of conversation I needed to have with someone who'd push back on me. Except I don't have a design partner, so I made Claude do it.
+
+## The thinking behind it
+
+If you're curious why the process works the way it does:
+
+- **Commander's Intent** (from Made to Stick) — the military figured out that plans fall apart on contact with reality, so they lead every order with a single sentence describing the desired outcome. SimplyUI does the same: one sentence goal before anything else, and every idea gets tested against it.
+- **Curse of Knowledge** (same book) — once you know how something works, you can't imagine what it's like not to know. That's why the map command doesn't ask you to describe your app. It describes it wrong and lets you correct it. Way more effective.
+- **Jobs-to-be-Done** (Christensen, Harvard) — every feature serves one job. If you need two sentences to describe the job, you've got two features. The framework enforces this.
+- **Hick's Law** — every option you put on a screen is cognitive tax. The framework counts decisions per screen and flags anything over 7.
+- **Franchise Prototype** (from The E-Myth) — the questions are the same every time because the system should produce the result, not your ability to think about design on the fly.
+
+The `research/` folder has the full deep-dive on each of these.
+
+## What gets created in your project
 
 ```
 your-project/
@@ -102,8 +107,6 @@ your-project/
     work/
       <slug>/brief.md          ← one brief per task
 ```
-
-### How the pieces connect
 
 ```
                     First time only
@@ -130,11 +133,11 @@ your-project/
 
 ## Limitations
 
-This was built for mobile app UIs. The principles apply to other stuff, but the specific advice (thumb zones, tap depth limits) assumes a phone screen.
+Built for mobile app UIs. The principles work elsewhere but the specific advice (thumb zones, tap depth) assumes a phone.
 
-It only plans. It won't write code or suggest how to implement anything. If you want a tool that also builds, this isn't it.
+Only plans. Won't write code or suggest implementations. If you want a tool that also builds, this isn't it.
 
-It's a single-dev tool. No multi-user collaboration, no Figma integration, no design handoff process.
+Single-dev tool. No multi-user collaboration or design handoff.
 
 ## License
 
