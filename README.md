@@ -94,7 +94,7 @@ SimplyUI is a set of Claude Code skills (markdown files). No packages, no depend
 
 1. **Download** this repo (clone, zip, whatever):
    ```bash
-   git clone https://github.com/YOUR_USERNAME/simply-ui.git
+   git clone https://github.com/bigapejit/simply-ui.git
    ```
 
 2. **Copy the skills** into your project's `.claude/skills/` directory:
